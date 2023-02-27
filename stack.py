@@ -5,6 +5,14 @@
 
 # Clase para la estructura de un stack
 
+def toStack(lista):
+    stack = Stack()
+    [stack.push(i) for i in lista]
+    return stack
+
+def toList(stack):
+    return [stack.pop() for i in range(stack.size())]
+
 class Stack:
     def __init__(self):
         self.item = []
@@ -20,6 +28,9 @@ class Stack:
 
     def peek(self):
         return self.item[0]
+
+    def last(self):
+        return self.item[-1]
     
     def size(self):
         return len(self.item)
@@ -27,4 +38,6 @@ class Stack:
     def show(self):
         return (self.item)
 
+    def appendPos(self, pos, value):
+        return self.insert(pos, value)
     

@@ -5,6 +5,8 @@
 
 # Árbol para representar la expresión regular
 
-# class Tree:
+class Tree:
     
-#     def __init__(self):
+    def __init__(self, root):
+        self.root = root
+        self.nodes = []

@@ -5,19 +5,54 @@
 
 # Archivo principal del programa
 
-
 # Importar clases
+from automata import automata
+from validations import addConcatenations
+from toPostfix import infix_to_postfix
 from symbol import Symbol
-from toPostfix import toPostfix
-from stack import Stack
+from node import Node
+from stack import Stack, toStack, toList
 
 # Expresión regular sobre la que se hará el autómata
-regex = "ab*(c|d)e"
-stack = Stack()
-temp = Stack()
+regex = "(a|b).(c|d)?.e"
 
-# Convertir cada símbolo de la regex en un objeto
-[stack.push(Symbol(obj)) for obj in regex]
-toPostfix(stack, temp)
+# Expresión regular infix: a|b.c
+# Expresión regular postfix: abc.|
+# Expresión regular infix: (a|b).c
+# Expresión regular postfix: ab|.c.
+# Expresión regular infix: a.(b|c)+
+# Expresión regular postfix: abc|+.
+# Expresión regular infix: (a|b).(c|d)?.e
+# Expresión regular postfix: ab|cd|?.e.
+# Expresión regular infix: a+bc?
+# Expresión regular postfix: abc+?
 
+regex = infix_to_postfix(regex)
+print(regex)
+regex = [Symbol(i) for i in regex]
+stack = toStack(regex)
+print(stack.item)
 
+# Create nodes
+operandos = Stack()
+
+while stack.size() > 0:
+    val = stack.pop()
+    # definir casos
+    print(val.value, operandos.size())
+    if val.value not in "+|*?.":
+        operandos.push(val)
+
+    elif val.value in "|.":
+        parent = val
+        left = operandos.pop()
+        right = operandos.pop()
+        # Crear nodo
+        operandos.push(Node(parent=parent, left=left, right=right))
+
+    elif val.value in "*+?":
+        parent = val
+        left = operandos.pop()
+        operandos.push(Node(parent = parent, left = left))
+
+print(operandos.item)

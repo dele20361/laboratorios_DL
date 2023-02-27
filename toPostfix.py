@@ -5,50 +5,44 @@
 
 # Módulo del algoritno Shunting para convertir la cadena de infix a postfix
 
+from symbol import Symbol
+
 def notGreater(val, stack):
     try:
         return True if val.precedence <= stack[-1].precedence else False
     except KeyError:
         return False
 
-def toPostfix(regex, stack):
-    '''
-        Convierte una expresión regular infix a postfix.
+from collections import deque
 
-        Parámetros:
-        -----------
-        - regex: Objeto stack con la regex contenida
-        - stack: stack temporal para realizar la conversión
-    '''
+def infix_to_postfix(infix):
+    output_queue = deque()
+    operator_stack = []
 
-    regex = regex.item # Lista con valores de la regex
-    output = []
+    for char in infix:
+        symbol = Symbol(char)
 
-    for val in regex: 
+        if symbol.notOperator():
+            output_queue.append(symbol)
 
-        if val.isNumeric == False:
-            output.append(val) 
-        
-        elif val.value == '(': 
-            stack.push(val) 
+        elif char == '(':
+            operator_stack.append(symbol)
 
-        elif val == ')': 
+        elif char == ')':
+            while operator_stack[-1].value != '(':
+                output_queue.append(operator_stack.pop())
+            operator_stack.pop()
 
-            while (not stack.isEmpty() and stack.peek().value != '('): 
-                a = stack.pop() 
-                output.append(a) 
-            if (not stack.isEmpty() and stack.peek().value != '('): 
-                return -1
-            else: 
-                stack.pop() 
+        else:
+            while operator_stack and symbol.precedence <= operator_stack[-1].precedence:
+                output_queue.append(operator_stack.pop())
+            operator_stack.append(symbol)
 
-        else: 
-            while(not stack.isEmpty() and notGreater(val, regex)): 
-                output.append(stack.pop()) 
-            stack.push(val) 
+    while operator_stack:
+        output_queue.append(operator_stack.pop())
 
-    while not stack.isEmpty(): 
-        output.append(stack.pop())
+    postfix = ""
+    for symbol in output_queue:
+        postfix += symbol.value
 
-    print ("\n output", (output))
-    print([(obj.value) for obj in output])
+    return postfix

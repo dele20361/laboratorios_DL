@@ -12,13 +12,13 @@ class Symbol:
         self.ascii = ord(value)
         self.precedence = self.precedence()
 
-    def isNumeric(self):
-        return True if self.value.isdigit() else False
+    def notOperator(self):
+        return True if self.value not in "()+*|?." else False
     
     def precedence(self):
         match self.value:
             case '(':
-                return 4
+                return 0
             case '*':
                 return 3
             case '+':
@@ -29,6 +29,6 @@ class Symbol:
                 return 2
             case '|':
                 return 1
-
         return 0
+
     
