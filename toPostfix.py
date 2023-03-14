@@ -5,7 +5,9 @@
 
 # Módulo del algoritno Shunting para convertir la cadena de infix a postfix
 
+from stack import Stack, toStack
 from symbol import Symbol
+from validations import addConcatenations
 
 def notGreater(val, stack):
     try:
@@ -15,7 +17,16 @@ def notGreater(val, stack):
 
 from collections import deque
 
-def infix_to_postfix(infix):
+def alphabet(regex):
+    alphabet = list(regex)
+
+    for op in '+?*.|()':
+        if op in alphabet:
+            alphabet.remove(op)
+
+    return alphabet
+
+def infix_to_postfix(infix, alphabet):
     output_queue = deque()
     operator_stack = []
 

@@ -27,7 +27,7 @@ class Stack:
         return self.item.pop()
 
     def peek(self):
-        return self.item[0]
+        return self.item[-1]
 
     def last(self):
         return self.item[-1]
