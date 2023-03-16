@@ -6,6 +6,7 @@
 from turtle import left
 from types import NoneType
 from AFN import AFN
+from AFD import AFD
 from ctypes import Union
 from symbol import Symbol
 
@@ -212,7 +213,7 @@ class Node:
 
 # --------------------- Creación de AFN utilizando método directo ---------------------
 
-    def 
+    # def 
 
 # -------------------------------------------------------------------------------------
 

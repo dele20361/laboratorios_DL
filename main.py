@@ -9,10 +9,10 @@
 from toPostfix import infix_to_postfix, alphabet
 from symbol import Symbol
 from node import Node
-from stack import Stack, toStack, toList
+from stack import Stack, toStack
 
 # Expresión regular sobre la que se hará el autómata
-regex = "(a+).b.(c?)"
+regex = "a|b.c"
 # Obtener alfabeto
 alphabet = alphabet(regex)
 
@@ -83,4 +83,6 @@ res = operandos.item[0]
 tree = res.printNode()
 print('arbol: ', tree)
 thompsonAFN = res.thompsonAutomataAFN
-thompsonAFN.to_graphviz()
+thompsonAFN.to_graphviz(filename='AFN_thompson')
+AFDsubset = thompsonAFN.to_AFD()
+AFDsubset.to_graphviz(filename = 'AFD_subset')
