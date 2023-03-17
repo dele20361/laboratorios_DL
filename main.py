@@ -11,7 +11,6 @@ from graphviz import Digraph
 from numpy import sort
 from AFD import AFD
 from Minimizacion import Minimizacion
-# from Minimizacion import AFDMinimizer
 from toPostfix import infix_to_postfix, alphabetF
 from symbol import Symbol
 from node import Node
@@ -33,17 +32,8 @@ regex = [Symbol(i) for i in regex]
 operandos = Stack()
 
 # # Pruebas
-# (a*|b*)c
-# (b|b)*abb(a|b)* ->
-# (a|ε)b(a+)c? ->
-# (a|b)*a(a|b)(a|b)
-# b*ab? ->
-# b+abc+ -> T
-# ab*ab*
-# 0(0|1)*0
-# ((ε|0)1*)*
-# (0|1)*0(0|1)(0|1) -> CASI
-# (00)*(11)*
+# (b|b)*abb(a|b)*
+# b*ab? 
 
 # Construcción del árbol
 number = 0 # Para enumeración del árbol sintáctico
@@ -304,7 +294,7 @@ else:
     # Thompson
     thompsonAFN = res.thompsonAutomataAFN
     thompsonAFN.to_graphviz(filename='AFN_thompson')
-    thompsonAFN.simulacion(cadena)
+    thompsonAFN.simulacionAFN(cadena)
 
     # Subconjuntos
     AFDsubset = thompsonAFN.to_AFD()

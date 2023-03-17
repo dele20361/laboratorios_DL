@@ -117,7 +117,7 @@ class AFN(Automata):
             alphabet = newAlphabet
         )
             
-    def simulacion(self, cadena):
+    def simulacionAFN(self, cadena):
         """
             Simulación de una cadena en autómata.
         """
@@ -139,18 +139,18 @@ class AFN(Automata):
                 if i != self.q_end and c in self.transitions[i].keys():
                     state = tuple(self.transitions[i][c])[0]
                     break
-
-            if state == prevState:
-                print('@! Cadena no aceptada. No se encontró una transición para el caracter "', c, '"')
-                return False
                 
             # Actualizar el estado anterior
             prevState = state
+            prevChar = c
 
         # Verificar si llegó a un estado de aceptación
         finalizado = [state]
         cerraduraEstado = self.state_closure(state, cerradura_epsilon, res)
         finalizado.extend(cerraduraEstado)
+
+        print(state)
+        print(self.q_end)
 
         if self.q_end in finalizado:
             print(">> La cadena pertenece al lenguaje. ")
