@@ -5,53 +5,67 @@
 
 # Módulo del algoritno Shunting para convertir la cadena de infix a postfix
 
-from stack import Stack, toStack
+from stack import Stack
 from symbol import Symbol
-from validations import addConcatenations
 
-def notGreater(val, stack):
-    try:
-        return True if val.precedence <= stack[-1].precedence else False
-    except KeyError:
-        return False
+def alphabetF(infix):
 
-from collections import deque
+    alphabet = set(infix) - set('*+?.|()')
+    return list(alphabet)
 
-def alphabet(regex):
-    alphabet = list(regex)
 
-    for op in '+?*.|()':
-        if op in alphabet:
-            alphabet.remove(op)
+def infix_to_postfix(infix):
 
-    return alphabet
-
-def infix_to_postfix(infix, alphabet):
-    output_queue = deque()
-    operator_stack = []
+    alphabet = alphabetF(infix)
+    unitary = ['*', '+', '?'] # Operaciones unarias
+    operator_stack = Stack()
+    output_queue = []
+    last = ''
 
     for char in infix:
         symbol = Symbol(char)
 
-        if symbol.notOperator():
+        if char in alphabet:
+            if (last in alphabet) or (last == ")") or (last in unitary):
+                # Si el estado previo es unario, ) o pertenece al alfabeto agregar concatenación
+                concat = Symbol('.')
+                while (not operator_stack.isEmpty()) and concat.precedence <= operator_stack.peek().precedence:
+                    output_queue.append(operator_stack.pop())
+                operator_stack.push(concat)
+
             output_queue.append(symbol)
 
         elif char == '(':
-            operator_stack.append(symbol)
+            if (last in alphabet) or last == ")" or last in unitary:
+                # Si el estado previo es unario, ) o pertenece al alfabeto agregar concatenación
+                concat = Symbol('.')
+                while (not operator_stack.isEmpty()) and concat.precedence <= operator_stack.peek().precedence:
+                    output_queue.append(operator_stack.pop())
+                operator_stack.push(concat)
+
+            operator_stack.push(symbol)
 
         elif char == ')':
-            while operator_stack[-1].value != '(':
+            while ((not operator_stack.isEmpty()) and (operator_stack.peek().value != '(')):
+                # Agregar todos los operadores hasta antes de (.
                 output_queue.append(operator_stack.pop())
+            
             operator_stack.pop()
 
         else:
-            while operator_stack and symbol.precedence <= operator_stack[-1].precedence:
+            # Operador 
+            while not operator_stack.isEmpty() and symbol.precedence <= operator_stack.peek().precedence:
                 output_queue.append(operator_stack.pop())
-            operator_stack.append(symbol)
+            operator_stack.push(symbol)
 
-    while operator_stack:
+        last = char
+
+    # Agregar operadores restantes al output
+    while not operator_stack.isEmpty():
         output_queue.append(operator_stack.pop())
 
+
+    # Convertir en str
     postfix = ""
     for symbol in output_queue:
         postfix += symbol.value

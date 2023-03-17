@@ -16,28 +16,28 @@ def toList(stack):
 class Stack:
     def __init__(self):
         self.item = []
+        self.top = -1
 
     def push(self, data):
-        self.item.insert(0, data)
+        self.top += 1
+        self.item.append(data)
 
     def isEmpty(self):
-        return self.item == []
+        if self.top == -1:
+            return True
+        else:
+            return False
 
     def pop(self):
-        return self.item.pop()
+        if not self.isEmpty():
+            self.top -= 1
+            return self.item.pop()
+        else:
+            return None
 
     def peek(self):
         return self.item[-1]
 
-    def last(self):
-        return self.item[-1]
-    
-    def size(self):
-        return len(self.item)
-
     def show(self):
         return (self.item)
-
-    def appendPos(self, pos, value):
-        return self.insert(pos, value)
     
