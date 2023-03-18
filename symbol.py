@@ -7,10 +7,15 @@
 
 class Symbol:
 
-    def __init__(self, value):
+    def __init__(self, value, number=None):
         self.value = value
+        self.number = number
         self.ascii = ord(value)
         self.precedence = self.precedence()
+
+    def changeNumber(self, number):
+        self.number = number
+        return self.number
 
     def notOperator(self):
         return True if self.value not in "()+*|?." else False

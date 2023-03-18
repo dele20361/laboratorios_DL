@@ -37,3 +37,35 @@ class AFD(Automata):
                     symbol = j
                     endNode = transitions[j]
                     g.edge(str(tuple(startNode)), str(tuple(endNode)), label=symbol)
+
+    def simulacion(self, cadena):
+        """
+            Simulación de una cadena en autómata.
+        """
+        cadena = list(cadena)
+        state = self.q_start
+        prevState = None
+
+        while len(cadena) > 0:
+
+            c = cadena.pop(0)
+
+            # Calcular estados alcanzables con valor del input
+            if c in self.transitions[tuple(state)].keys():
+                state = tuple(self.transitions[tuple(state)][c])
+            else:
+                print('@! Cadena no aceptada. No se encontró una transición para el caracter "', c, '"')
+                return False
+                
+            # Actualizar el estado anterior
+            prevState = state
+
+        # Verificar si llegó a un estado de aceptación
+        finalizado = [state]
+
+        if state in self.q_end:
+            print(">> La cadena pertenece al lenguaje. ")
+            return True
+        else:
+            print('@! Cadena no aceptada. No se llegó a un estado de aceptación.')
+            return False

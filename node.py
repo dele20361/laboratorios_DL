@@ -3,10 +3,9 @@
 # Ana Paola De León Molina, 20361
 # Laboratorio A
 
-from turtle import left
-from types import NoneType
 from AFN import AFN
 from AFD import AFD
+import copy
 from ctypes import Union
 from symbol import Symbol
 
@@ -27,17 +26,41 @@ class Node:
         Clase para simular un nodo del árbol y creación de autómatas con distintos métodos.
     """
 
-    def __init__(self, parent=None, right = None, left = None):
+    def __init__(self, parent=None, right = None, left = None, direct = False):
 
         # Nodos del árbol
         self.parent: Symbol = parent
         self.right: Union[Symbol, Node] = right
         self.left: Union[Symbol, Node] = left
 
+        self.tree = None
+        # Método para construcción de AFD
+        # # direct: False -> Thompson y minimización
+        # # direct: True -> Directo y minimización
+        self.direct: bool = direct
+
         # Autómata finito no determinista
         self.thompsonAutomataAFN: AFN = None
+
         # Llamar funciones de construcción
-        self.constructionMethods()
+        if not direct :
+            self.constructionMethods()
+
+
+    def deepcopy_node(self, node):
+        new_node = Node(parent=node.parent, right=node.right, left=node.left, direct=node.direct)
+
+        if isinstance(node.left, Node):
+            new_node.left = self.deepcopy_node(node.left)
+        else:
+            new_node.left = node.left
+
+        if isinstance(node.right, Node):
+            new_node.right = self.deepcopy_node(node.right)
+        else:
+            new_node.right = node.right
+
+        return new_node
 
 
     def printNode(self):
@@ -46,12 +69,34 @@ class Node:
         left = self.left
         parent = self.parent
 
-        return (
-                    self.parent.value if isinstance(parent, Symbol) else self.parent.printNode(),
-                    self.left.value if self.left is not None and isinstance(left, Symbol) else (self.left.printNode() if self.left is not None else None),
-                    self.right.value if self.right is not None and isinstance(right, Symbol) else (self.right.printNode() if self.right is not None else None)
-                )
+        self.tree = (
+                    [parent.value, parent.number] if isinstance(parent, Symbol) and parent.number != None else ( parent.value if isinstance(parent, Symbol) else parent.printNode()),
+                    [left.value, "left.number"] if self.left is not None and isinstance(left, Symbol) else ( left.printNode() if left is not None else None),
+                    [right.value, "right.number"] if self.right is not None and isinstance(right, Symbol) else ( right.printNode() if right is not None else None)
+                    )
+        
+        return self.tree
 
+
+    def add_nodes(self, graph, node):
+        """
+            Visualización de árbol sintáctico.
+        """
+        if node is None:
+            return None
+        
+        if type(node) == tuple:
+            parent = str(id(node))
+            graph.node(parent, str(node[0]), shape='circle', style='filled', fillcolor="#D4EFDF", color='#7DCEA0')
+            for child in node[1:]:
+                child_id = self.add_nodes(graph, child)
+                if child_id:
+                    graph.edge(parent, str(child_id), color='#7DCEA0')
+            return parent
+        else:
+            node_id = str(id(node))
+            graph.node(node_id, str(node))
+            return node_id
 
 
     # ------------------------ Creación de AFN utilizando thompson ------------------------
@@ -208,15 +253,6 @@ class Node:
         # self.thompsonAutomataAFN.to_graphviz(filename = 'andAFN')
 
 
-# -------------------------------------------------------------------------------------
-
-
-# --------------------- Creación de AFN utilizando método directo ---------------------
-
-    # def 
-
-# -------------------------------------------------------------------------------------
-
     def constructionMethods(self):
 
         if self.parent.notOperator():
@@ -227,3 +263,63 @@ class Node:
             self.orThompson()
         elif self.parent.value == '.':
             self.andThompson()
+
+# -------------------------------------------------------------------------------------
+
+
+# --------------------- Creación de AFN utilizando método directo ---------------------
+
+    def anulable(self):
+
+        match self.parent.value:
+            case 'ε':
+                return True
+            case '*':
+                return True
+            case '|':
+                return self.left.anulable() or self.right.anulable()
+            case '.':
+                return self.left.anulable() and self.right.anulable()
+
+        if self.parent.number:
+            return False
+
+
+    def primeraPosicion(self):
+
+        match self.parent.value:
+            case 'ε':
+                return {}
+            case '*':
+                return self.left.primeraPosicion()
+            case '|':
+                return self.left.primeraPosicion().union(self.right.primeraPosicion())
+            case '.':
+                if self.left.anulable():
+                    return self.left.primeraPosicion().union(self.right.primeraPosicion())
+                else:
+                    return self.left.primeraPosicion()
+        
+        if self.parent.number is not None:
+            return {self.parent.number}
+
+
+    def ultimaPosicion(self):
+
+        match self.parent.value:
+            case 'ε':
+                return {}
+            case '*':
+                return self.left.ultimaPosicion()
+            case '|':
+                return self.left.ultimaPosicion().union(self.right.ultimaPosicion())
+            case '.':
+                if self.right.anulable():
+                    return self.left.ultimaPosicion().union(self.right.ultimaPosicion())
+                else:
+                    return self.right.ultimaPosicion()
+        
+        if self.parent.number is not None:
+            return {self.parent.number}
+
+# -------------------------------------------------------------------------------------

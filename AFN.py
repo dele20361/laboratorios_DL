@@ -5,7 +5,6 @@
 
 # Clase para la construcción de AFN
 
-from numpy import char, sort
 from AFD import AFD
 from Automata import Automata
 from stack import Stack, toStack
@@ -37,9 +36,9 @@ class AFN(Automata):
                 recheable = []
                 if epsilon in transitions[state]:
                     for i in transitions[state][epsilon]:
-                        recheable.append(i)
+                        if i not in recheable:
+                            recheable.append(i)
 
-                
                 closure.append({state: recheable})
 
         return closure
@@ -81,7 +80,7 @@ class AFN(Automata):
                 for q in newState:
                     # Obtener estados alcanzables
                     if q != self.q_end and q in self.transitions.keys() and c in self.transitions[q].keys():
-                        [destine.add(i) for i in self.transitions[q][c] if i not in newState] 
+                        [destine.add(i) for i in self.transitions[q][c]] 
                     
                 # Ver si los estados destino tienen transiciones epsilon por agregar
                 newTran = set()
@@ -96,7 +95,7 @@ class AFN(Automata):
 
                 # Push al stack de estado al que llegó
                 if destine:
-                    if destine not in D_states:
+                    if tuple(destine) not in D_states and destine != set():
                         D_states.add(tuple(destine))
                         stack.push(list(destine))
 
@@ -109,11 +108,6 @@ class AFN(Automata):
         # Definir estados alcanzables
         D_states = newTransitions.keys()
 
-        # Definir estados de aceptación/finales
-        for q in D_states:
-            if self.q_end in q:
-                acceptance_states.add(q)
-
         # Crear AFD
         return AFD(
             Q = D_states,
@@ -123,3 +117,44 @@ class AFN(Automata):
             alphabet = newAlphabet
         )
             
+    def simulacion(self, cadena):
+        """
+            Simulación de una cadena en autómata.
+        """
+        cadena = list(cadena)
+        state = self.q_start
+        prevState = None
+
+        while len(cadena) > 0:
+
+            c = cadena.pop(0)
+
+            # Calcular cerradura de epsilon
+            res = set()
+            cerradura_epsilon = self.closure()
+            cerraduraEstado = self.state_closure(state, cerradura_epsilon, res)
+
+            # Calcular estados alcanzables con valor del input
+            for i in cerraduraEstado:
+                if i != self.q_end and c in self.transitions[i].keys():
+                    state = tuple(self.transitions[i][c])[0]
+                    break
+
+            if state == prevState:
+                print('@! Cadena no aceptada. No se encontró una transición para el caracter "', c, '"')
+                return False
+                
+            # Actualizar el estado anterior
+            prevState = state
+
+        # Verificar si llegó a un estado de aceptación
+        finalizado = [state]
+        cerraduraEstado = self.state_closure(state, cerradura_epsilon, res)
+        finalizado.extend(cerraduraEstado)
+
+        if self.q_end in finalizado:
+            print(">> La cadena pertenece al lenguaje. ")
+            return True
+        else:
+            print('@! Cadena no aceptada. No se llegó a un estado de aceptación.')
+            return False
