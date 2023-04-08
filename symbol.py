@@ -7,18 +7,19 @@
 
 class Symbol:
 
-    def __init__(self, value, number=None):
-        self.value = value
+    def __init__(self, value, number=None, notOp=None):
+        self.value = str(value)
         self.number = number
-        self.ascii = ord(value)
+        # self.ascii = ord(value)
         self.precedence = self.precedence()
+        self.notOp = notOp if isinstance(notOp, bool) else False # Bandera para símbolos +*|?. especiales
 
     def changeNumber(self, number):
         self.number = number
         return self.number
 
     def notOperator(self):
-        return True if self.value not in "()+*|?." else False
+        return True if self.value not in "()+*|?." or self.notOp == True else False
     
     def precedence(self):
         match self.value:
