@@ -93,11 +93,6 @@ def convertToSymbol(regex):
             res.append(temp)
             i = i + 3
 
-        # # Ver si es espacio en blanco
-        # elif regex[i] == " ":
-        #     res.append(Symbol(ord(" ")))
-        #     i = i + 1
-
         else:
             res.append(Symbol(regex[i]))
             i = i + 1

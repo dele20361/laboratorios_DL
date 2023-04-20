@@ -18,7 +18,7 @@ def alphabetF(infix):
 def infix_to_postfix(infix):
 
     # Chequear paréntesis
-    print("@ Error en paréntesis! Revise la expresión regular.") if not checkParenthesis(infix) else True
+    # print("@ Error en paréntesis! Revise la expresión regular.") if not checkParenthesis(infix) else True
 
     alphabet = alphabetF(infix)
     unitary = ['*', '+', '?'] # Operaciones unarias

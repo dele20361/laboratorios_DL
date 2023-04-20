@@ -3,10 +3,15 @@
 # Ana Paola De León Molina, 20361
 # Laboratorio C
 
+from tree import Tree
+from graphviz import Digraph
+from rulesProcessing import processRules, createRulesDictionary
+
 class Lexer:
     def __init__(self, filepath) -> None:
         self.lines = self.openFile(filepath)
         self.tokens = {}
+        self.rules = {}
         self.createDictionary()
 
     def openFile(self, filepath="./testsLabC/slr-4.yal"):
@@ -18,14 +23,15 @@ class Lexer:
         """
         with open(filepath, "r") as f:
             lines = f.readlines()
-
         return lines
 
     def createDictionary(self):
+        rulesList = []
         # Crear estructura de datos con tokens
-        for line in self.lines:
+        for pos, line in enumerate(self.lines):
+            cleanLine = line.strip()
             # Si la línea comienza con "let"
-            if line[:3] == "let":
+            if cleanLine[:3] == "let":
                 # Obtener el nombre del token
                 token_name = line[line.index(" ")+1:line.index("=")].strip()
                 
@@ -36,6 +42,9 @@ class Lexer:
                 
                 # Agregar token a diccionario
                 self.tokens[token_name] = tokenValue
+            
+            elif cleanLine[:4] == "rule":
+                rulesList = self.lines[pos:]
 
         for tokenName, tokenValue in self.tokens.items():
 
@@ -51,7 +60,7 @@ class Lexer:
 
                 self.tokens[tokenName] = new_value
 
-            if tokenValue.startswith("[") and tokenValue.endswith("]"):
+            if tokenValue[0:1] == ("[") and list(tokenValue)[-1] == ("]"):
                 tokenValue = tokenValue[1:-1]
 
                 tokenValue = tokenValue.replace("'", "")  # eliminar comillas simples
@@ -118,4 +127,35 @@ class Lexer:
                     newTokenValue = newTokenValue.replace(i, "(" + str(self.tokens[i]) + ")")
                     self.tokens[tokenName] = newTokenValue
 
-        return self.tokens
+        # ------------------------------ Procesar rules ------------------------------ #
+        strRules = processRules(rulesList)
+        self.rules = createRulesDictionary(strRules)
+
+        # Sustituir nombres de tokens por valor en rules
+        for returnVal, tokenValue in self.rules.items():
+            newTokenValue = tokenValue
+            for i in ids:
+                if i in tokenValue:
+                    newTokenValue = newTokenValue.replace(i, "(" + str(self.tokens[i]) + ")")
+                    self.rules[returnVal] = newTokenValue
+
+        return self.rules
+
+if __name__ == '__main__':
+
+    # ------------------ Para mostrar árbol de tokens individuales ------------------ #
+
+    lexer = Lexer("./testsLabC/slr-1.yal")
+    # print(lexer.rules)
+    posToken = 4
+    tokenVal = list(lexer.rules.values())[posToken]
+    tokenName = list(lexer.rules.keys())[posToken]
+
+    tree = Tree(tokenVal, direct=True, tokenName=tokenName)
+    tree = tree.tree
+    treeTuple = tree.printNode()
+
+    # Visualización de árbol
+    graph = Digraph()
+    tree.add_nodes(graph, treeTuple)
+    graph.render('./treeImage/treeSingleToken', format='png', view=True)

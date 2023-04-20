@@ -5,7 +5,6 @@
 
 from AFN import AFN
 from AFD import AFD
-import copy
 from ctypes import Union
 from symbol import Symbol
 

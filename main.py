@@ -16,17 +16,17 @@ from tree import Tree
 
 # Expresión regular sobre la que se hará el autómata
 # regex = input("Expresión regular a generar: ") or "((0|1|2|3|4|5|6|7|8|9)+)('.'((0|1|2|3|4|5|6|7|8|9)+))?('E'('+'|'-')?((0|1|2|3|4|5|6|7|8|9)+))?"
-filepath = input(">> Ingrese el path relativo del archivo .yal: ") or "./testsLabC/slr-1.yal"
+filepath = input(">> Ingrese el path relativo del archivo .yal: ") or "./testsLabC/slr-4.yal"
 lexer = Lexer(filepath)
 direct = True
 
-tokens = lexer.tokens
+tokens = lexer.rules
 
 if direct:
 
     print("\n\nMétodo directo")
+    print(tokens)
     # cadena = input("Ingrese la cadena a simular: ") or "bab"
-
     trees = Stack()
     for tokenName, tokenValue in tokens.items():
         treeObj = Tree(tokenValue, direct, tokenName)
