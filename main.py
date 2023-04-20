@@ -7,7 +7,7 @@
 
 # Importar clases
 from graphviz import Digraph
-from AFD import AFD
+# from AFD import AFD
 from symbol import Symbol
 from node import Node
 from stack import Stack

@@ -3,8 +3,8 @@
 # Ana Paola De León Molina, 20361
 # Laboratorio A
 
-from AFN import AFN
-from AFD import AFD
+# from AFN import AFN
+# from AFD import AFD
 from ctypes import Union
 from symbol import Symbol
 

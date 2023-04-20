@@ -1,6 +1,6 @@
-## Laboratorios
-Curso: Diseño de Lenguajes de Programación
+## Laboratorio D
 
-[Video Laboratorio 4](https://drive.google.com/file/d/19a3JKlLfEDZap9EKnkWda7zimAqRegPQ/view?usp=sharing)
-
-[Video Laboratorio C](https://drive.google.com/file/d/1gBuBExLKQ9BxSxqXmFMLHpBubpGcB0gS/view?usp=sharing)
+Este laboratorio consiste en la implementación de un generador de analizadores léxicos, el cual,
+tomando como entrada un archivo escrito en YALex, generará un analizador léxico que será capaz
+de reconocer los tokens especificados, o en su defecto, errores léxicos. Este laboratorio toma como
+base el trabajo realizado en laboratorios anteriores.
