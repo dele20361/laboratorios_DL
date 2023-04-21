@@ -3,7 +3,7 @@
 (* Introducir cualquier header aqui *)
 
 let delim = ['\s''\t''\n']
-let ws = (a|b)+abc?
+let ws = (a|ε)b(a+)c?
 let letter = ['A'-'Z''a'-'z']
 let digit = ['0'-'9']
 let digits = digit+

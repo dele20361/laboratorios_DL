@@ -7,9 +7,10 @@
 
 class Symbol:
 
-    def __init__(self, value, number=None, notOp=None):
+    def __init__(self, value, number=None, notOp=None, hashtag=None):
         self.value = str(value)
         self.number = number
+        self.hashtag = hashtag if isinstance(hashtag, bool) else False # Bandera para símbolos +*|?. especiales
         # self.ascii = ord(value)
         self.precedence = self.precedence()
         self.notOp = notOp if isinstance(notOp, bool) else False # Bandera para símbolos +*|?. especiales

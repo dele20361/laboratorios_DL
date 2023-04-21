@@ -96,7 +96,7 @@ class Tree:
         res = operandos.pop()
 
         concat = Symbol('.')
-        hashtagSymbol = Symbol('#', number=self.numberGlobal+1)
+        hashtagSymbol = Symbol('#', number=self.numberGlobal+1, hashtag=True)
         hashtag = Node(parent=hashtagSymbol, direct=self.direct)
         self.alphabetNumbers[self.numberGlobal+1] = hashtagSymbol
         self.alphabet.append('#')

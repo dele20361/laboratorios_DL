@@ -15,7 +15,7 @@ from LabC import Lexer
 from tree import Tree
 
 
-filepath = input(">> Ingrese el path relativo del archivo .yal: ") or "./testsLabC/slr-2.yal"
+filepath = input(">> Ingrese el path relativo del archivo .yal: ") or "./testsLabC/slr-1.yal"
 lexer = Lexer(filepath)
 direct = True
 
@@ -34,7 +34,7 @@ if direct:
         numberGlobal = treeObj.numberGlobal + 1
         trees.push(treeObj.tree) # Push del nodo árbol
 
-    print('> Expresión regular a generar: ', final[:-1])
+    print('> Expresión regular a generar: ', final[:-1], '\n\n')
 
     # Obtener el árbol sintáctico final
     while len(trees.item) > 1:
@@ -95,7 +95,7 @@ if direct:
         for char in alphabet:
             newStates = set()
             for p in state:
-                if p in alphabetNumbers.keys() and char in completedFollowpos[p]:
+                if p in alphabetNumbers.keys() and not alphabetNumbers[p].hashtag and char in completedFollowpos[p]:
                     newStates = newStates.union(completedFollowpos[p][char])
 
             tempState = newStates
@@ -125,4 +125,4 @@ if direct:
     # Imprimir AFD
     afdDirecto.to_graphviz(filename = 'afdDirecto')
 
-#     # --------------------------------------------------------------------------------
+## --------------------------------------------------------------------------------
