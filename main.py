@@ -14,8 +14,7 @@ from stack import Stack
 from LabC import Lexer
 from tree import Tree
 
-# Expresión regular sobre la que se hará el autómata
-# regex = input("Expresión regular a generar: ") or "((0|1|2|3|4|5|6|7|8|9)+)('.'((0|1|2|3|4|5|6|7|8|9)+))?('E'('+'|'-')?((0|1|2|3|4|5|6|7|8|9)+))?"
+
 filepath = input(">> Ingrese el path relativo del archivo .yal: ") or "./testsLabC/slr-2.yal"
 lexer = Lexer(filepath)
 direct = True
@@ -24,11 +23,9 @@ tokens = lexer.rules
 
 if direct:
 
-    print("Método directo")
-    # cadena = input("Ingrese la cadena a simular: ") or "bab"
-
     numberGlobal = 0
     final = ''
+    followpos = {}
 
     trees = Stack()
     for tokenName, tokenValue in tokens.items():
@@ -62,3 +59,70 @@ if direct:
     graph = Digraph()
     tree.add_nodes(graph, treeTuple)
     graph.render('./treeImage/tree', format='png', view=True)
+
+    # Construcción de AFD por método directo
+    alphabetNumbers = treeObj.alphabetNumbers
+    alphabet = set()
+    [alphabet.add(i.value) for i in list(alphabetNumbers.values())]
+    hashtagNumber = numberGlobal
+
+    D_states = set()
+    D_transitions = {}
+    finalStates = set()
+
+    stack = Stack()
+    alphabet.remove('#')
+
+    followpos = treeNodeObj.followpos
+    completedFollowpos = {}
+
+    # Completar tabla de siguiente posición con símbolos
+    for key, value in followpos.items():
+        symbol = alphabetNumbers[key].value
+        completedFollowpos[key] = {symbol: value}
+
+    completedFollowpos[hashtagNumber] = {}
+
+    primerEstado = treeNodeObj.primeraPosicion()
+    stack.push(primerEstado)
+    D_states.add(tuple(primerEstado))
+
+    while not stack.isEmpty():
+        state = stack.pop()
+        state = tuple(state)
+        D_transitions[state] = {}
+
+        for char in alphabet:
+            newStates = set()
+            for p in state:
+                if p in alphabetNumbers.keys() and char in completedFollowpos[p]:
+                    newStates = newStates.union(completedFollowpos[p][char])
+
+            tempState = newStates
+            newStates = tuple(newStates)
+
+            if newStates:
+                if newStates not in D_states:
+                    D_states.add(newStates)
+                    stack.push(newStates)
+
+                    terminals = set([hashtagNumber]).intersection(set(tempState))
+
+                    if terminals:
+                        finalStates.add(newStates)
+
+                D_transitions[state][char] = newStates
+
+    # Crear AFD
+    afdDirecto = AFD(
+                    Q = D_states,
+                    q_start = tuple(primerEstado),
+                    q_end = finalStates,
+                    transitions = D_transitions,
+                    alphabet = alphabet
+                 )
+    
+    # Imprimir AFD
+    afdDirecto.to_graphviz(filename = 'afdDirecto')
+
+#     # --------------------------------------------------------------------------------

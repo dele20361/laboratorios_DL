@@ -11,21 +11,19 @@ from node import Node
 
 class Tree:
 
-    def __init__(self, regex, direct, number, tokenName=None) -> None:
-        """
-            Árbol sintáctico.
-        """
+    alpha = {}
+
+    def __init__(self, regex, direct, number, tokenName=None):
         self.regex = regex
         self.treeTuple = ()
         self.direct = direct
         self.hashtagNumber = 0
         self.numberGlobal = number
         self.tokenName = tokenName
-        self.alphabetNumbers = {}
+        self.alphabetNumbers = Tree.alpha
         self.tree = ()
         self.alphabet = alphabetF(self.regex)
         self.createTree()
-
 
     def createTree(self):
         """
@@ -109,3 +107,6 @@ class Tree:
         self.treeTuple = self.tree.printNode()
 
         return self.tree
+
+
+    # def toAFD(self):

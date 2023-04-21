@@ -26,7 +26,7 @@ class Node:
         Clase para simular un nodo del árbol y creación de autómatas con distintos métodos.
     """
 
-    def __init__(self, parent=None, right = None, left = None, direct = True):
+    def __init__(self, parent=None, right = None, left = None, direct = True, followpos = {}):
 
         # Nodos del árbol
         self.parent: Symbol = parent
@@ -35,6 +35,11 @@ class Node:
 
         self.tree = None
         self.direct: bool = direct
+
+        self.followpos = followpos
+        self.primeraPosicion()
+        self.ultimaPosicion()
+        self.siguientePosicion(self.followpos)
 
 
     def deepcopy_node(self, number):
@@ -92,17 +97,21 @@ class Node:
 
     def anulable(self):
 
-        match self.parent.value:
-            case 'ε':
-                return True
-            case '*':
-                return True
-            case '|':
-                return self.left.anulable() or self.right.anulable()
-            case '+':
-                return self.left.anulable()
-            case '.':
-                return self.left.anulable() and self.right.anulable()
+        if self.parent.value == 'ε' and not self.parent.notOp:
+            return True
+
+        elif  self.parent.value == '*' and not self.parent.notOp:
+            return True
+
+        elif  self.parent.value == '|' and not self.parent.notOp:
+            return self.left.anulable() or self.right.anulable()
+
+        elif  self.parent.value == '+' and not self.parent.notOp:
+            return self.left.anulable()
+
+        elif  self.parent.value == '.' and not self.parent.notOp:
+            return self.left.anulable() and self.right.anulable()
+
 
         if self.parent.number:
             return False
@@ -110,20 +119,22 @@ class Node:
 
     def primeraPosicion(self):
 
-        match self.parent.value:
-            case 'ε':
-                return {}
-            case '*':
-                return self.left.primeraPosicion()
-            case '+':
-                return self.left.primeraPosicion()
-            case '|':
+        if self.parent.value == 'ε' and not self.parent.notOp:
+            return {}
+        elif self.parent.value ==  '*' and not self.parent.notOp:
+            return self.left.primeraPosicion()
+
+        elif self.parent.value ==  '+' and not self.parent.notOp:
+            return self.left.primeraPosicion()
+
+        elif self.parent.value ==  '|' and not self.parent.notOp:
+            return self.left.primeraPosicion().union(self.right.primeraPosicion())
+
+        elif self.parent.value ==  '.' and not self.parent.notOp:
+            if self.left.anulable():
                 return self.left.primeraPosicion().union(self.right.primeraPosicion())
-            case '.':
-                if self.left.anulable():
-                    return self.left.primeraPosicion().union(self.right.primeraPosicion())
-                else:
-                    return self.left.primeraPosicion()
+            else:
+                return self.left.primeraPosicion()
         
         if self.parent.number is not None:
             return {self.parent.number}
@@ -131,20 +142,51 @@ class Node:
 
     def ultimaPosicion(self):
 
-        match self.parent.value:
-            case 'ε':
-                return {}
-            case '*':
-                return self.left.ultimaPosicion()
-            case '|':
+        if self.parent.value == 'ε':
+            return {}
+
+        elif self.parent.value == '*' and not self.parent.notOp:
+            return self.left.ultimaPosicion()
+        
+        elif self.parent.value == '+' and not self.parent.notOp:
+            return self.left.ultimaPosicion()
+
+        elif self.parent.value == '|' and not self.parent.notOp:
+            return self.left.ultimaPosicion().union(self.right.ultimaPosicion())
+
+        elif self.parent.value == '.' and not self.parent.notOp:
+            if self.right.anulable():
                 return self.left.ultimaPosicion().union(self.right.ultimaPosicion())
-            case '.':
-                if self.right.anulable():
-                    return self.left.ultimaPosicion().union(self.right.ultimaPosicion())
-                else:
-                    return self.right.ultimaPosicion()
+            else:
+                return self.right.ultimaPosicion()
         
         if self.parent.number is not None:
             return {self.parent.number}
+
+
+    def siguientePosicion(self, followpos:list=None):
+
+        if self.parent.value == '*' and not self.parent.notOp:
+            for i in self.ultimaPosicion():
+                if i in self.followpos:
+                    self.followpos[i] = self.followpos[i].union(self.primeraPosicion())
+                else:
+                    self.followpos[i] = self.primeraPosicion()
+
+        elif self.parent.value == '+' and not self.parent.notOp:
+            for i in self.ultimaPosicion():
+                if i in self.followpos:
+                    self.followpos[i] = self.followpos[i].union(self.primeraPosicion())
+                else:
+                    self.followpos[i] = self.primeraPosicion()
+
+        elif self.parent.value == '.' and not self.parent.notOp:
+            for i in self.left.ultimaPosicion():
+                if i in self.followpos:
+                    self.followpos[i] = self.followpos[i].union(self.right.primeraPosicion())
+                else:
+                    self.followpos[i] = self.right.primeraPosicion()
+            pass
+
 
 # -------------------------------------------------------------------------------------
