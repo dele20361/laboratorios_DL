@@ -1,3 +1,5 @@
+import copy
+from AFD import AFD
 from toPostfix import infix_to_postfix, alphabetF
 from types import NoneType
 from symbol import Symbol
@@ -6,9 +8,10 @@ from validations import *
 from stack import Stack
 from node import Node
 
+
 class Tree:
 
-    def __init__(self, regex, direct, tokenName=None) -> None:
+    def __init__(self, regex, direct, number, tokenName=None) -> None:
         """
             Árbol sintáctico.
         """
@@ -16,10 +19,13 @@ class Tree:
         self.treeTuple = ()
         self.direct = direct
         self.hashtagNumber = 0
+        self.numberGlobal = number
         self.tokenName = tokenName
+        self.alphabetNumbers = {}
         self.tree = ()
         self.alphabet = alphabetF(self.regex)
         self.createTree()
+
 
     def createTree(self):
         """
@@ -27,23 +33,19 @@ class Tree:
         """
         # Obtener alfabeto y convertir a postfix
         self.regex = infix_to_postfix(self.regex)
-        print(self.regex)
         # Convertir a objeto symbol
         self.regex = convertToSymbol(self.regex)
 
         # Construcción del árbol
-        number = 0 # Para enumeración del árbol sintáctico
-        alphabetNumbers = {}
         operandos = Stack()
 
         for val in self.regex:
             # definir casos
             if val.value not in "+|*?." or val.notOp == True:
-                # print(val.value)
-                number = number + 1
-                val.changeNumber(number=number)
+                self.numberGlobal = self.numberGlobal + 1
+                val.changeNumber(number=self.numberGlobal)
                 nodo = Node(parent=val, direct=self.direct)
-                alphabetNumbers[nodo.parent.number] = val
+                self.alphabetNumbers[nodo.parent.number] = val
                 operandos.push(nodo)
 
             elif val.value in "|." and val.notOp == False:
@@ -73,19 +75,15 @@ class Tree:
             elif val.value == "+" and val.notOp == False:
                 # Crear primero nodo kleene
                 parent = Symbol("*")
-                right = operandos.pop()
-                nodoKleene = Node(parent = parent, left = right, direct=self.direct)
+                left = operandos.pop()
                 
-                if isinstance(right, NoneType):
+                if isinstance(left, NoneType):
                     print('@ Error en "'+ val.value + '"!. Para este operador se requiere 1 operando.')
-                
-                # right = deep(right, alphabetNumbers, number)
 
                 # Crear concatenación
-                parent = Symbol(".")
-                left = nodoKleene
+                parent = Symbol("+")
 
-                nodo = Node(parent=parent, left=left, right=right, direct=self.direct)
+                nodo = Node(parent=parent, left=left, direct=self.direct)
                 operandos.push(nodo)
 
             elif val.value == "*" and val.notOp == False:
@@ -100,11 +98,11 @@ class Tree:
         res = operandos.pop()
 
         concat = Symbol('.')
-        hashtagSymbol = Symbol('#', number=number+1)
+        hashtagSymbol = Symbol('#', number=self.numberGlobal+1)
         hashtag = Node(parent=hashtagSymbol, direct=self.direct)
-        alphabetNumbers[number+1] = hashtagSymbol
+        self.alphabetNumbers[self.numberGlobal+1] = hashtagSymbol
         self.alphabet.append('#')
-        self.hashtagNumber = number
+        self.hashtagNumber = self.numberGlobal
 
         # Añadir nodo terminal
         self.tree = Node(parent=concat, left=res, right=hashtag, direct=self.direct)

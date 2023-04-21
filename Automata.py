@@ -17,6 +17,7 @@ class Automata():
         self.transitions = transitions
         self.alphabet = alphabet
 
+
     def generate_nodes(self, g):
         # Agregar los nodos
         for q in self.Q:
@@ -31,12 +32,14 @@ class Automata():
                 if str(q) != "()":
                     g.node(str(q), shape='circle', style='filled', fillcolor=node_color, color='black')
 
+
     def generate_edges(self,g):
         # Agregar las transiciones
         for q, t in self.transitions.items():
             for symbol, next_states in t.items():
                 for next_state in next_states:
                     g.edge(str(q), str(next_state), label=symbol)
+
 
     def to_graphviz(self, filename = 'afn'):
         """
@@ -61,3 +64,4 @@ class Automata():
             print(f"Error al generar imagen del autómata: {e}")
 
         return g
+

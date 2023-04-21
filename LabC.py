@@ -8,11 +8,13 @@ from graphviz import Digraph
 from rulesProcessing import processRules, createRulesDictionary
 
 class Lexer:
+
     def __init__(self, filepath) -> None:
         self.lines = self.openFile(filepath)
         self.tokens = {}
         self.rules = {}
         self.createDictionary()
+
 
     def openFile(self, filepath="./testsLabC/slr-4.yal"):
         """ 
@@ -24,6 +26,7 @@ class Lexer:
         with open(filepath, "r") as f:
             lines = f.readlines()
         return lines
+
 
     def createDictionary(self):
         rulesList = []
@@ -140,6 +143,7 @@ class Lexer:
                     self.rules[returnVal] = newTokenValue
 
         return self.rules
+
 
 if __name__ == '__main__':
 

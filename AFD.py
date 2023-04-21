@@ -3,8 +3,6 @@
 # Ana Paola De León Molina, 20361
 # Laboratorio B
 
-from gettext import translation
-from graphviz import Digraph
 from Automata import Automata
 
 
@@ -12,6 +10,7 @@ class AFD(Automata):
 
     def __str__(self) -> str:
         return super().__str__()
+
 
     def generate_nodes(self, g):
         # Agregar los nodos
@@ -27,6 +26,7 @@ class AFD(Automata):
                 if str(q) != "()":
                     g.node(str(q), shape='circle', style='filled', fillcolor=node_color, color='black')
 
+
     def generate_edges(self, g):
         # Agregar las transiciones
         for i in self.Q:
@@ -37,6 +37,7 @@ class AFD(Automata):
                     symbol = j
                     endNode = transitions[j]
                     g.edge(str(tuple(startNode)), str(tuple(endNode)), label=symbol)
+
 
     def simulacion(self, cadena):
         """
@@ -69,3 +70,5 @@ class AFD(Automata):
         else:
             print('@! Cadena no aceptada. No se llegó a un estado de aceptación.')
             return False
+
+

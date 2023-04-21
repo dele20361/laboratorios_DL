@@ -3,13 +3,13 @@
 # Ana Paola De León Molina, 20361
 # Laboratorio A
 
-from AFN import AFN
 from AFD import AFD
 from ctypes import Union
 from symbol import Symbol
 
 labelId = 0
 epsilon = 'ε'
+
 
 def label():
     '''
@@ -20,12 +20,13 @@ def label():
     labelId += 1
     return state
 
+
 class Node:
     """
         Clase para simular un nodo del árbol y creación de autómatas con distintos métodos.
     """
 
-    def __init__(self, parent=None, right = None, left = None, direct = False):
+    def __init__(self, parent=None, right = None, left = None, direct = True):
 
         # Nodos del árbol
         self.parent: Symbol = parent
@@ -33,33 +34,22 @@ class Node:
         self.left: Union[Symbol, Node] = left
 
         self.tree = None
-        # Método para construcción de AFD
-        # # direct: False -> Thompson y minimización
-        # # direct: True -> Directo y minimización
         self.direct: bool = direct
 
-        # Autómata finito no determinista
-        self.thompsonAutomataAFN: AFN = None
 
-        # Llamar funciones de construcción
-        if not direct :
-            self.constructionMethods()
+    def deepcopy_node(self, number):
 
+        if self.left is None and self.right is None:
+            return Node(parent=Symbol(self.parent.value, number=number)), number + 1
 
-    def deepcopy_node(self, node):
-        new_node = Node(parent=node.parent, right=node.right, left=node.left, direct=node.direct)
+        new_node = Node(parent=self.parent, right=self.right, left=self.left, direct=self.direct)
 
-        if isinstance(node.left, Node):
-            new_node.left = self.deepcopy_node(node.left)
-        else:
-            new_node.left = node.left
+        if isinstance(self.left, Node):
+            new_node.left, number = self.left.deepcopy_node(number)
+        if isinstance(self.right, Node):
+            new_node.right, number = self.right.deepcopy_node(number)
 
-        if isinstance(node.right, Node):
-            new_node.right = self.deepcopy_node(node.right)
-        else:
-            new_node.right = node.right
-
-        return new_node
+        return new_node, number
 
 
     def printNode(self):
@@ -98,174 +88,6 @@ class Node:
             return node_id
 
 
-    # ------------------------ Creación de AFN utilizando thompson ------------------------
-
-    def symbolThompson(self):
-
-        """
-            Creación de autómata de symbols.
-
-            (Referencia para construcción: https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Thompson-a-symbol.svg/556px-Thompson-a-symbol.svg.png)
-        """
-        q_start = label()
-        q_end = label()
-
-        self.thompsonAutomataAFN = AFN(
-                                Q = [q_start, q_end],
-                                q_start = q_start,
-                                q_end = q_end,
-                                transitions = {q_start: {self.parent.value: [q_end]}},
-                                alphabet = [self.parent.value],
-                            )
-
-        # self.thompsonAutomataAFN.to_graphviz(filename = 'symbolAFN')
-    
-
-    def kleeneThompson(self):
-
-        """
-            Creación de AFN mediante Thompson.
-            
-            (Referencia para construcción: https://i.stack.imgur.com/XTHXI.jpg)
-        """
-
-        # Obtener información del nodo left
-        leftNode = self.left.thompsonAutomataAFN
-        transitions = leftNode.transitions
-        alphabet = leftNode.alphabet
-        Q = leftNode.Q
-
-        # Nuevo lenguaje
-        alphabet.append(epsilon) if epsilon not in alphabet else alphabet
-
-        # Nuevos estados
-        q_start = label()
-        q_end = label()
-        q_states = [q_start, q_end]
-
-        # Nuevas transiciones
-        transitions[q_start] = { epsilon: [leftNode.q_start, q_end] }
-        transitions[leftNode.q_end] = { epsilon: [leftNode.q_start, q_end]}
-
-        # Nuevos estados
-        Q.extend(q_state for q_state in q_states if q_state not in Q)
-
-        self.thompsonAutomataAFN = AFN(
-                                Q = Q,
-                                q_start = q_start,
-                                q_end = q_end,
-                                transitions = transitions,
-                                alphabet = alphabet
-                            )
-
-        # self.thompsonAutomataAFN.to_graphviz(filename = 'kleeneAFN')
-
-
-    def orThompson(self):
-
-        """
-            Creación de AFN mediante Thompson.
-            
-            (Referencia para construcción: https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Thompson-or.svg/453px-Thompson-or.svg.png)
-        """
-        # Obtener información de nodos
-        # left
-        leftNode = self.left.thompsonAutomataAFN
-        leftTransitions = leftNode.transitions
-        alphabet = leftNode.alphabet
-        Q = leftNode.Q
-
-        # right
-        rightNode = self.right.thompsonAutomataAFN
-        rightTransitions = rightNode.transitions
-        alphabet.extend(sym for sym in rightNode.alphabet if sym not in alphabet)
-        Q.extend(q_state for q_state in rightNode.Q if q_state not in Q)
-
-        # Unir transiciones
-        transitions = {}
-        transitions.update(leftTransitions)
-        transitions.update(rightTransitions)
-
-        # Nuevas transiciones
-        q_start = label()
-        q_end = label()
-        q_states = [q_start, q_end]
-        transitions[q_start] = { epsilon: [leftNode.q_start, rightNode.q_start] }
-        transitions[leftNode.q_end] = { epsilon: [q_end] }
-        transitions[rightNode.q_end] = { epsilon: [q_end] }
-
-        # Nuevo lenguaje
-        alphabet.append(epsilon) if epsilon not in alphabet else alphabet
-
-        # Nuevos estados
-        Q.extend(q_state for q_state in q_states if q_state not in Q)
-
-        self.thompsonAutomataAFN = AFN(
-                                Q = Q,
-                                q_start = q_start,
-                                q_end = q_end,
-                                transitions = transitions,
-                                alphabet = alphabet
-                            )
-
-        # self.thompsonAutomataAFN.to_graphviz(filename = 'orAFN')
-
-
-    def andThompson(self):
-
-        """
-            Creación de AFN mediante Thompson.
-            
-            (Referencia para construcción: https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Thompson-concat.svg/796px-Thompson-concat.svg.png)
-        """
-        # Obtener información de nodos
-        # left
-        leftNode = self.left.thompsonAutomataAFN
-        leftTransitions = leftNode.transitions
-        alphabet = leftNode.alphabet
-        Q = leftNode.Q
-
-        # right
-        rightNode = self.right.thompsonAutomataAFN
-        rightTransitions = rightNode.transitions
-        alphabet.extend(sym for sym in rightNode.alphabet if sym not in alphabet) 
-        Q.extend(q_state for q_state in rightNode.Q if q_state not in Q)
-
-        # Unir transiciones
-        transitions = {}
-        transitions.update(leftTransitions)
-        transitions.update(rightTransitions)
-        transitions[leftNode.q_end] = { epsilon: [rightNode.q_start]}
-
-        # Update de start y end node
-        q_start = leftNode.q_start
-        q_end = rightNode.q_end
-
-        self.thompsonAutomataAFN = AFN(
-                                Q = Q,
-                                q_start = q_start,
-                                q_end = q_end,
-                                transitions = transitions,
-                                alphabet = alphabet
-                            )
-
-        # self.thompsonAutomataAFN.to_graphviz(filename = 'andAFN')
-
-
-    def constructionMethods(self):
-
-        if self.parent.notOperator():
-            self.symbolThompson()
-        elif self.parent.value == '*':
-            self.kleeneThompson()
-        elif self.parent.value == '|':
-            self.orThompson()
-        elif self.parent.value == '.':
-            self.andThompson()
-
-# -------------------------------------------------------------------------------------
-
-
 # --------------------- Creación de AFN utilizando método directo ---------------------
 
     def anulable(self):
@@ -277,6 +99,8 @@ class Node:
                 return True
             case '|':
                 return self.left.anulable() or self.right.anulable()
+            case '+':
+                return self.left.anulable()
             case '.':
                 return self.left.anulable() and self.right.anulable()
 
@@ -290,6 +114,8 @@ class Node:
             case 'ε':
                 return {}
             case '*':
+                return self.left.primeraPosicion()
+            case '+':
                 return self.left.primeraPosicion()
             case '|':
                 return self.left.primeraPosicion().union(self.right.primeraPosicion())
