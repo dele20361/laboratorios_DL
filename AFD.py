@@ -52,17 +52,15 @@ class AFD(Automata):
                         token.add(self.hashtagToken[i])
                         
             else:
-                print('@! Error léxico. No se encontró una transición para el caracter "', c, '"')
-                return False
+                error = '@! Error léxico. No se encontró una transición para el caracter "' + c + '"'
+                recognizedTokens[cadena] = error
+                return recognizedTokens
 
         if state in self.q_end:
-            print(">> Token reconocido: ", list(token)[-1])
             recognizedTokens[cadena] = list(token)[-1]
             return recognizedTokens
         else:
             if len(token) != 0:
-                print('@! Error léxico. No se llegó a ningún estado de aceptación.')
                 return False
             else:
-                print('>> Último token reconocido: ', token)
                 return recognizedTokens

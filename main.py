@@ -6,6 +6,7 @@
 # Archivo principal del programa
 
 # Importar clases
+from generatePy import generateFile
 from graphviz import Digraph
 from AFD import AFD
 from symbol import Symbol
@@ -135,15 +136,7 @@ if direct:
                  )
     
     # Imprimir AFD
-    afdDirecto.to_graphviz(filename = 'afdDirecto')
-
-    # Leer archivo
-    filepath = 'LabD/tests/text.txt'
-    with open(filepath, "r") as f:
-        lines = [line.rstrip() for line in f.readlines()]
-
-    for prueba in lines:
-        print(prueba)
-        afdDirecto.simulacion(prueba)
+    # afdDirecto.to_graphviz(filename = 'afdDirecto')
+    generateFile(D_states, primerEstado, finalStates, D_transitions, alphabet, hashtagsNumbers, hashtagToken)
 
 ## --------------------------------------------------------------------------------

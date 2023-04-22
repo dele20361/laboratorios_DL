@@ -1,0 +1,6 @@
+Cadena              Token
+------------------------------------- 
+1.23E+8             NUMBER
+\n                  WHITESPACE
+while True:         ID
+if :                @! Error léxico. No se encontró una transición para el caracter ":"
