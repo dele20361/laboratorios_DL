@@ -24,7 +24,7 @@ class Automata():
             if q == self.q_start:
                 node_color = '#FCF3CF'
                 g.node(str(q), shape='circle', style='filled', fillcolor=node_color, color='black')
-            elif q == self.q_end:
+            elif q in self.q_end:
                 node_color = '#7DCEA0'
                 g.node(str(q), shape='doublecircle', style='filled', fillcolor=node_color, color='black') 
             else: 

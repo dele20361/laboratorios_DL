@@ -10,13 +10,17 @@ let digit = ['0'-'9']
 let digits = digit+
 let id = letter(letter|str|digit)*
 let number = digits(.digits)?('E'['+''-']?digits)?
+let while = while
+let if = if
+let whilecond = (while(delim(letter+(:))))
+let ifstatement = (if(delim(letter+(:))))
 
 rule tokens = 
-    ws
+    ws        { return WHITESPACE}
   | id        { return ID }               (* Cambie por una acción válida, que devuelva el token *)
   | number    { return NUMBER }
   | ';'       { return SEMICOLON }
-  | ":="      { return ASSIGNOP }
+  | ':='      { return ASSIGNOP }
   | '<'       { return LT }
   | '='       { return EQ }
   | '+'       { return PLUS }
@@ -25,5 +29,8 @@ rule tokens =
   | '/'       { return DIV }
   | '('       { return LPAREN }
   | ')'       { return RPAREN }
+  | if       { return IF }
+  | whilecond     { return WHILECOND }
+  | ifstatement    { return IFSTATEMENT}
 
 (* Introducir cualquier trailer aqui *)

@@ -15,7 +15,7 @@ from LabC import Lexer
 from tree import Tree
 
 
-filepath = input(">> Ingrese el path relativo del archivo .yal: ") or "./testsLabC/slr-1.yal"
+filepath = input(">> Ingrese el path relativo del archivo .yal: ") or "./testsLabC/slr-4.yal"
 lexer = Lexer(filepath)
 direct = True
 
@@ -26,12 +26,14 @@ if direct:
     numberGlobal = 0
     final = ''
     followpos = {}
+    hashtagToken = {} # key: hashtag number, value: token name
 
     trees = Stack()
     for tokenName, tokenValue in tokens.items():
         final = final + tokenValue + '|'
         treeObj = Tree(tokenValue, direct, numberGlobal, tokenName)
         numberGlobal = treeObj.numberGlobal + 1
+        hashtagToken[numberGlobal] = tokenName
         trees.push(treeObj.tree) # Push del nodo árbol
 
     print('> Expresión regular a generar: ', final[:-1], '\n\n')
@@ -81,12 +83,20 @@ if direct:
         symbol = alphabetNumbers[key].value
         completedFollowpos[key] = {symbol: value}
 
+    hashtagsNumbers = set()
+    hashtagsNumbers.add(hashtagNumber)
+
+    for number, obj in alphabetNumbers.items():
+        if obj.hashtag:
+            hashtagsNumbers.add(number)
+
     completedFollowpos[hashtagNumber] = {}
 
     primerEstado = treeNodeObj.primeraPosicion()
     stack.push(primerEstado)
     D_states.add(tuple(primerEstado))
 
+    # Transiciones
     while not stack.isEmpty():
         state = stack.pop()
         state = tuple(state)
@@ -106,7 +116,7 @@ if direct:
                     D_states.add(newStates)
                     stack.push(newStates)
 
-                    terminals = set([hashtagNumber]).intersection(set(tempState))
+                    terminals = set(hashtagsNumbers).intersection(set(tempState))
 
                     if terminals:
                         finalStates.add(newStates)
@@ -119,10 +129,21 @@ if direct:
                     q_start = tuple(primerEstado),
                     q_end = finalStates,
                     transitions = D_transitions,
-                    alphabet = alphabet
+                    alphabet = alphabet,
+                    hashtagNumbers= hashtagsNumbers,
+                    hashtagToken = hashtagToken
                  )
     
     # Imprimir AFD
     afdDirecto.to_graphviz(filename = 'afdDirecto')
+
+    # Leer archivo
+    filepath = 'LabD/tests/text.txt'
+    with open(filepath, "r") as f:
+        lines = [line.rstrip() for line in f.readlines()]
+
+    for prueba in lines:
+        print(prueba)
+        afdDirecto.simulacion(prueba)
 
 ## --------------------------------------------------------------------------------

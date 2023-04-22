@@ -11,7 +11,6 @@ class Symbol:
         self.value = str(value)
         self.number = number
         self.hashtag = hashtag if isinstance(hashtag, bool) else False # Bandera para símbolos +*|?. especiales
-        # self.ascii = ord(value)
         self.precedence = self.precedence()
         self.notOp = notOp if isinstance(notOp, bool) else False # Bandera para símbolos +*|?. especiales
 
