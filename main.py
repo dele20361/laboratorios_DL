@@ -16,7 +16,7 @@ from LabC import Lexer
 from tree import Tree
 
 
-filepath = input(">> Ingrese el path relativo del archivo .yal: ") or "./testsLabC/slr-4.yal"
+filepath = input(">> Ingrese el path relativo del archivo .yal: ") or "./testsLabC/slr-1.yal"
 lexer = Lexer(filepath)
 direct = True
 
@@ -61,7 +61,7 @@ if direct:
     # Visualización de árbol
     graph = Digraph()
     tree.add_nodes(graph, treeTuple)
-    graph.render('./treeImage/tree', format='png', view=True)
+    # graph.render('./treeImage/tree', format='png', view=True)
 
     # Construcción de AFD por método directo
     alphabetNumbers = treeObj.alphabetNumbers
@@ -92,6 +92,8 @@ if direct:
             hashtagsNumbers.add(number)
 
     completedFollowpos[hashtagNumber] = {}
+    # print(followpos)
+    # print(completedFollowpos)
 
     primerEstado = treeNodeObj.primeraPosicion()
     stack.push(primerEstado)
@@ -140,3 +142,5 @@ if direct:
     generateFile(D_states, primerEstado, finalStates, D_transitions, alphabet, hashtagsNumbers, hashtagToken)
 
 ## --------------------------------------------------------------------------------
+
+

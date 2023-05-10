@@ -16,7 +16,10 @@ let whilecond = (while(delim(letter+(:))))
 let ifstatement = (if(delim(letter+(:))))
 
 rule tokens = 
-    ws        { return WHITESPACE}
+    'if'        { return IF }
+  | whilecond     { return WHILECOND }
+  | ifstatement    { return IFSTATEMENT}
+  |  ws       { return WHITESPACE}
   | id        { return ID }               (* Cambie por una acción válida, que devuelva el token *)
   | number    { return NUMBER }
   | ';'       { return SEMICOLON }
@@ -30,7 +33,5 @@ rule tokens =
   | '('       { return LPAREN }
   | ')'       { return RPAREN }
   | if       { return IF }
-  | whilecond     { return WHILECOND }
-  | ifstatement    { return IFSTATEMENT}
 
 (* Introducir cualquier trailer aqui *)

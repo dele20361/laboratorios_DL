@@ -1,7 +1,0 @@
-digraph {
-	4350113088 [label="." color="#7DCEA0" fillcolor="#D4EFDF" shape=circle style=filled]
-	4350112832 [label="['(', 1]" color="#7DCEA0" fillcolor="#D4EFDF" shape=circle style=filled]
-	4350113088 -> 4350112832 [color="#7DCEA0"]
-	4350112960 [label="['#', 2]" color="#7DCEA0" fillcolor="#D4EFDF" shape=circle style=filled]
-	4350113088 -> 4350112960 [color="#7DCEA0"]
-}

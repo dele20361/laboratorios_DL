@@ -33,7 +33,7 @@ class AFD(Automata):
         listCadena = list(cadena)
         state = self.q_start
         recognizedTokens = {}
-        token = set()
+        token = []
 
         while listCadena:
 
@@ -47,18 +47,26 @@ class AFD(Automata):
             if c in self.transitions[tuple(state)].keys():
                 state = tuple(self.transitions[tuple(state)][c])
 
+                added = False
                 for i in self.hashtagNumbers:
-                    if i in state and i in self.hashtagToken:
-                        token.add(self.hashtagToken[i])
+                    if i in state and i in self.hashtagToken and not added:
+                        if len(token) > 0 and self.hashtagToken[i] != token[-1]:
+                            token.append(self.hashtagToken[i])
+                            added = True
+                        elif len(token) == 0 and self.hashtagToken[i] not in token:
+                            token.append(self.hashtagToken[i])
+                            added = True
                         
             else:
                 error = '@! Error léxico. No se encontró una transición para el caracter "' + c + '"'
-                recognizedTokens[cadena] = error
-                return recognizedTokens
+                token.append(error)
 
         if state in self.q_end:
-            recognizedTokens[cadena] = list(token)[-1]
-            return recognizedTokens
+            if not any("@!" in elem for elem in token):
+                recognizedTokens[cadena] = list(token)[-1]
+            else:
+                recognizedTokens[cadena] = list(token)
+                return recognizedTokens
         else:
             if len(token) != 0:
                 return False
