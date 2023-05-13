@@ -57,18 +57,25 @@ class LR0():
 
         while not stateStack.isEmpty():
             evaluatingProd = stateStack.pop()
+
+            # Buscar pos del puntito
             if len(evaluatingProd) > 1:
                 prod = list(evaluatingProd[1])
                 puntitoPos = prod.index('.')
                 if len(prod) > puntitoPos + 1:
+                    # Obtener lo que está al lado derecho del puntito
                     right = prod[puntitoPos + 1]
+                    # Verificar si es un no terminal
                     if right.islower() and right not in rightEvaluated:
                         rightEvaluated.add(right)
                         for izq, der in self.productionRules:
+                            # Buscar transiciones que tengan en el lado 
+                            # derecho el estado no terminal right
                             if izq == right:
                                 new_prod = (izq, der)
                                 state.append(new_prod)
                                 stateStack.push(new_prod)
+
         return state
 
 
@@ -98,7 +105,6 @@ class LR0():
             # Ahora items es esto
             items = statesStack.pop()
 
-            # Me falta ver cuál es el estado que tiene un no terminal a la derecha del puntito
             # Ver donde está el puntito
             for produccion in items:
                 if isinstance(produccion,list):
@@ -132,6 +138,9 @@ class LR0():
         self.transitions.append((final_transition, '$', self.q_end))
         self.to_graphviz()
         
+
+    # --------------------------------------------- GRAFICAR --------------------------------------------- #
+
     def generate_nodes(self, g):
         # Agregar los nodos
         for q in self.states:
@@ -177,6 +186,8 @@ class LR0():
             print(f"Error al generar imagen del autómata: {e}")
 
         return g
+
+
 
 if __name__ == '__main__':
 

@@ -1,6 +1,15 @@
-## Laboratorios
-Curso: Diseño de Lenguajes de Programación
+# Laboratorio E
+#### Curso: Diseño de Lenguajes de Programación
 
-[Video Laboratorio 4](https://drive.google.com/file/d/19a3JKlLfEDZap9EKnkWda7zimAqRegPQ/view?usp=sharing)
+- Imágen de autómata:
+![Automata](automataImage/lr.jpg)
 
-[Video Laboratorio C](https://drive.google.com/file/d/1gBuBExLKQ9BxSxqXmFMLHpBubpGcB0gS/view?usp=sharing)
+- Implementación de función MOVE():
+![Move](ReadmeLabE/move.png)
+
+- Implementación de función CLOSURE()
+![Closure](ReadmeLabE/closure.png)
+
+- Creación de autómata
+![Create part 1](ReadmeLabE/create1.png)
+![Create part 2](ReadmeLabE/create2.png)
