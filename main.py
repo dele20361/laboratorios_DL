@@ -6,141 +6,25 @@
 # Archivo principal del programa
 
 # Importar clases
-from generatePy import generateFile
-from graphviz import Digraph
-from AFD import AFD
-from symbol import Symbol
-from node import Node
-from stack import Stack
 from LabC import Lexer
-from tree import Tree
+from LabE import ProcessYalp
+from LR0 import LR0
 
-
-filepath = input(">> Ingrese el path relativo del archivo .yal: ") or "./testsLabC/slr-1.yal"
+filepath = "./testsLabC/slr-1.yal"
+filepathYalp = "./testsLabE/slr-1.yalp"
 lexer = Lexer(filepath)
-direct = True
+yalpProcess = ProcessYalp(filepathYalp)
 
 tokens = lexer.rules
+productions = yalpProcess.producciones
 
-if direct:
+# Verificar que los tokens de yalpProcess estén definidos en el lexer
+verifiedTokens = True
+for token in yalpProcess.tokens:
+    if token not in list(tokens.keys()):
+        verifiedTokens = False
 
-    numberGlobal = 0
-    final = ''
-    followpos = {}
-    hashtagToken = {} # key: hashtag number, value: token name
-
-    trees = Stack()
-    for tokenName, tokenValue in tokens.items():
-        final = final + tokenValue + '|'
-        treeObj = Tree(tokenValue, direct, numberGlobal, tokenName)
-        numberGlobal = treeObj.numberGlobal + 1
-        hashtagToken[numberGlobal] = tokenName
-        trees.push(treeObj.tree) # Push del nodo árbol
-
-    print('> Expresión regular a generar: ', final[:-1], '\n\n')
-
-    # Obtener el árbol sintáctico final
-    while len(trees.item) > 1:
-        parent = Symbol("|")
-        right = trees.pop()
-        left = trees.pop()
-        if left is None or right is None:
-            print('@ Error en "'+ parent.value + '"!. Para este operador se requieren 2 operandos.')
-
-        # Crear nodo
-        nodo = Node(parent=parent, left=left, right=right, direct=direct)
-        trees.push(nodo)
-
-
-    # El árbol sintáctico final estará en el único elemento restante del stack
-    treeNodeObj = trees.pop()
-    tree = treeNodeObj
-    treeTuple = tree.printNode()
-
-
-    # Visualización de árbol
-    graph = Digraph()
-    tree.add_nodes(graph, treeTuple)
-    # graph.render('./treeImage/tree', format='png', view=True)
-
-    # Construcción de AFD por método directo
-    alphabetNumbers = treeObj.alphabetNumbers
-    alphabet = set()
-    [alphabet.add(i.value) for i in list(alphabetNumbers.values())]
-    hashtagNumber = numberGlobal
-
-    D_states = set()
-    D_transitions = {}
-    finalStates = set()
-
-    stack = Stack()
-    alphabet.remove('#')
-
-    followpos = treeNodeObj.followpos
-    completedFollowpos = {}
-
-    # Completar tabla de siguiente posición con símbolos
-    for key, value in followpos.items():
-        symbol = alphabetNumbers[key].value
-        completedFollowpos[key] = {symbol: value}
-
-    hashtagsNumbers = set()
-    hashtagsNumbers.add(hashtagNumber)
-
-    for number, obj in alphabetNumbers.items():
-        if obj.hashtag:
-            hashtagsNumbers.add(number)
-
-    completedFollowpos[hashtagNumber] = {}
-    # print(followpos)
-    # print(completedFollowpos)
-
-    primerEstado = treeNodeObj.primeraPosicion()
-    stack.push(primerEstado)
-    D_states.add(tuple(primerEstado))
-
-    # Transiciones
-    while not stack.isEmpty():
-        state = stack.pop()
-        state = tuple(state)
-        D_transitions[state] = {}
-
-        for char in alphabet:
-            newStates = set()
-            for p in state:
-                if p in alphabetNumbers.keys() and not alphabetNumbers[p].hashtag and char in completedFollowpos[p]:
-                    newStates = newStates.union(completedFollowpos[p][char])
-
-            tempState = newStates
-            newStates = tuple(newStates)
-
-            if newStates:
-                if newStates not in D_states:
-                    D_states.add(newStates)
-                    stack.push(newStates)
-
-                    terminals = set(hashtagsNumbers).intersection(set(tempState))
-
-                    if terminals:
-                        finalStates.add(newStates)
-
-                D_transitions[state][char] = newStates
-
-    # Crear AFD
-    afdDirecto = AFD(
-                    Q = D_states,
-                    q_start = tuple(primerEstado),
-                    q_end = finalStates,
-                    transitions = D_transitions,
-                    alphabet = alphabet,
-                    hashtagNumbers= hashtagsNumbers,
-                    hashtagToken = hashtagToken
-                 )
-    
-    # Imprimir AFD
-    # afdDirecto.to_graphviz(filename = 'afdDirecto')
-    generateFile(D_states, primerEstado, finalStates, D_transitions, alphabet, hashtagsNumbers, hashtagToken)
-
-## --------------------------------------------------------------------------------
-
-
+if verifiedTokens:
+    lr = LR0(productions, tokens)
+else:
+    print('@! Error. Los tokens utilizados en el archivo .yalp no están totalmente definidos en el archivo .yal')

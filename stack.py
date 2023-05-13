@@ -7,7 +7,7 @@
 
 def toStack(lista):
     stack = Stack()
-    [stack.push(i) for i in lista]
+    [stack.push(i) for i in reversed(lista)]
     return stack
 
 def toList(stack):
