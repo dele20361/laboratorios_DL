@@ -24,7 +24,6 @@ class ProcessYalp:
 
         return content
 
-
     def createDictionary(self):
         c = self.content.pop()
 
@@ -35,15 +34,15 @@ class ProcessYalp:
         while not self.content.isEmpty():
             if c == '/' and self.content.peek() == '*':
                 inComment = True
-                self.content.pop()  # Saltar el carácter '*'
-                c = self.content.pop()  # Leer el siguiente carácter
+                self.content.pop()  
+                c = self.content.pop() 
 
                 # Iterar hasta encontrar el final del comentario '*/'
                 while c != '*' or self.content.peek() != '/':
                     c = self.content.pop()
 
-                self.content.pop()  # Saltar el carácter '/'
-                c = self.content.pop()  # Leer el siguiente carácter
+                self.content.pop()  
+                c = self.content.pop()  
                 inComment = False
 
             elif not inComment:

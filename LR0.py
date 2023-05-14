@@ -163,7 +163,7 @@ class LR0():
             g.edge(str(transicion[0]), str(transicion[2]), label=transicion[1])
 
 
-    def to_graphviz(self, filename = 'lr'):
+    def to_graphviz(self, filename = 'lr4'):
         """
             Generación de imagen para visualización de autómata
         """

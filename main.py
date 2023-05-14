@@ -10,8 +10,8 @@ from LabC import Lexer
 from LabE import ProcessYalp
 from LR0 import LR0
 
-filepath = "./testsLabC/slr-1.yal"
-filepathYalp = "./testsLabE/slr-1.yalp"
+filepath = "./testsLabC/slr-4.yal"
+filepathYalp = "./testsLabE/slr-4.yalp"
 lexer = Lexer(filepath)
 yalpProcess = ProcessYalp(filepathYalp)
 
