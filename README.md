@@ -1,6 +1,9 @@
 # Laboratorio E
 #### Curso: Diseño de Lenguajes de Programación
 
+- CLOSURE (Hice un nuevo commit solo para agregar la foto del closure)
+![Closure](EvidenciaClosure.png)
+
 - Imágen de autómata del primer archivo:
 ![Automata](automataImage/lr1.jpg)
 
