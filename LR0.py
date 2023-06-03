@@ -4,6 +4,7 @@ from graphviz import Digraph
 class LR0():
 
     def __init__(self, productions, tokens) -> None:
+        self.productions = productions
         self.productionRules = productions
         self.tokens = tokens
         self.q_init = []
@@ -11,6 +12,10 @@ class LR0():
         self.transitions = []
         self.states = []
         self.generateAutomata()
+        self.first = {}
+        self.follow = {}
+        self.firstF()
+        self.followF()
 
     def move(self, symbol: str, items: list, stack: Stack) -> list:
         next_state = []
@@ -136,8 +141,83 @@ class LR0():
         # Añadir transición final
         self.states.append(self.q_end)
         self.transitions.append((final_transition, '$', self.q_end))
-        self.to_graphviz()
+        # self.to_graphviz()
+
+
+    def firstF(self):
+        first = {}
         
+        # Inicializar el conjunto FIRST para cada símbolo no terminal
+        for non_terminal, _ in self.productionRules:
+            first[non_terminal] = set()
+        
+        while True:
+            updated = False
+            
+            for non_terminal, right in self.productionRules:
+                first_element = right[1]  # El primer elemento después del punto
+                
+                if first_element in self.tokens:
+                    if first_element not in first[non_terminal]:
+                        first[non_terminal].add(first_element)
+                        updated = True
+                elif first_element != non_terminal:
+                    if first_element in first.keys():
+                        for elem in first[first_element]:
+                            if elem not in first[non_terminal]:
+                                first[non_terminal].add(elem)
+                                updated = True
+            
+            if not updated:
+                break
+        
+        self.first = first
+
+
+    def followF(self):
+        # Lista de símbolos no terminales y terminales
+        non_terminals = set([prod[0] for prod in self.productionRules])
+        terminals = set(self.tokens)
+
+        follow = {symbol: set() for symbol in non_terminals}
+
+        # Caso base símbolo inicial
+        startSymbol = self.q_init[0]
+        follow[startSymbol[:-1]].add('$')
+
+        while True:
+            updated = False
+
+            for left, right in self.productionRules:
+                for i in range(len(right)):
+                    current_symbol = right[i]
+
+                    if current_symbol in non_terminals:
+                        if i == len(right) - 1:
+                            prev_follow_size = len(follow[current_symbol])
+                            follow[current_symbol].update(follow[left])
+                            if len(follow[current_symbol]) != prev_follow_size:
+                                updated = True
+                        else:
+                            next_symbol = right[i + 1]
+                            if next_symbol in terminals:
+                                prev_follow_size = len(follow[current_symbol])
+                                follow[current_symbol].add(next_symbol)
+                                if len(follow[current_symbol]) != prev_follow_size:
+                                    updated = True
+                            elif next_symbol in non_terminals:
+                                prev_follow_size = len(follow[current_symbol])
+                                next_symbols = self.first[next_symbol]
+                                follow[current_symbol].update(next_symbols)
+                                follow[current_symbol].discard('')
+                                if len(follow[current_symbol]) != prev_follow_size:
+                                    updated = True
+
+            if not updated:
+                break
+
+        self.follow = follow
+
 
     # --------------------------------------------- GRAFICAR --------------------------------------------- #
 

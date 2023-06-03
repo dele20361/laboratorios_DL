@@ -9,9 +9,10 @@
 from LabC import Lexer
 from LabE import ProcessYalp
 from LR0 import LR0
+from SLR1 import SLR1
 
-filepath = "./testsLabC/slr-4.yal"
-filepathYalp = "./testsLabE/slr-4.yalp"
+filepath = "./testsLabC/slr-1.yal"
+filepathYalp = "./testsLabE/slr-1.yalp"
 lexer = Lexer(filepath)
 yalpProcess = ProcessYalp(filepathYalp)
 
@@ -26,5 +27,6 @@ for token in yalpProcess.tokens:
 
 if verifiedTokens:
     lr = LR0(productions, tokens)
+    slr1 = SLR1(lr)
 else:
     print('@! Error. Los tokens utilizados en el archivo .yalp no están totalmente definidos en el archivo .yal')

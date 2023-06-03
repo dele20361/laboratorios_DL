@@ -140,5 +140,6 @@ if __name__ == '__main__':
 
     # ------------------ Para mostrar árbol de tokens individuales ------------------ #
     lexer = ProcessYalp("./testsLabE/slr-1.yalp")
-
+    print(lexer.producciones)
+    print(lexer.tokens)
     
